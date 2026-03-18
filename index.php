@@ -1,5 +1,5 @@
 <?php
-include 'koneksi.php';
+include 'includes/koneksi.php';
 
 if (isset($_POST['submit'])) {
     
@@ -10,54 +10,37 @@ if (isset($_POST['submit'])) {
     $alamat   = $_POST['alamat'];
     $notelp   = $_POST['notelp'];
 
-    
     $jk = isset($_POST['jk']) ? $_POST['jk'] : null;
-    if ($jk === "Pria") {
-        $jkValue = 0;
-    } elseif ($jk === "Wanita") {
-        $jkValue = 1;
-    } else {
-        $jkValue = null;
-    }
+    $jkValue = ($jk === "Pria") ? 0 : (($jk === "Wanita") ? 1 : null);
 
-   
-    $hobi = null;
-    if (!empty($_POST['hobi'])) {
-        $hobi = implode(", ", $_POST['hobi']);
-    }
+    $hobi = !empty($_POST['hobi']) ? implode(", ", $_POST['hobi']) : null;
 
-   
     $foto = null;
     if (!empty($_FILES['foto']['name'])) {
         $target = "uploads/" . basename($_FILES['foto']['name']);
-        if (!is_dir("uploads")) {
-            mkdir("uploads");
-        }
+        if (!is_dir("uploads")) mkdir("uploads");
         if (move_uploaded_file($_FILES['foto']['tmp_name'], $target)) {
             $foto = $target;
         }
     }
 
-    
     $sql = "INSERT INTO peserta (nama, \"tempatLahir\", \"tanggalLahir\", agama, alamat, telepon, jk, hobi, foto)
             VALUES (:nama, :tempatLahir, :tanggalLahir, :agama, :alamat, :telepon, :jk, :hobi, :foto)";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([
-        ':nama'        => $nama,
-        ':tempatLahir' => $tempat,
-        ':tanggalLahir'=> $tanggal,
-        ':agama'       => $agama,
-        ':alamat'      => $alamat,
-        ':telepon'     => $notelp,
-        ':jk'          => $jkValue,
-        ':hobi'        => $hobi,
-        ':foto'        => $foto
+        ':nama'         => $nama,
+        ':tempatLahir'  => $tempat,
+        ':tanggalLahir' => $tanggal,
+        ':agama'        => $agama,
+        ':alamat'       => $alamat,
+        ':telepon'      => $notelp,
+        ':jk'           => $jkValue,
+        ':hobi'         => $hobi,
+        ':foto'         => $foto
     ]);
     
-    echo "<p>Data berhasil disimpan ke database!</p>";
-     header("Location: index.php"); 
+    header("Location: index.php"); 
     exit;
-
 }
 ?>
 
@@ -65,13 +48,18 @@ if (isset($_POST['submit'])) {
 <html>
 <head>
     <title>Formulir Pendaftaran Siswa</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        
+        .btn-edit { background-color: #ffc107; color: black; padding: 5px 10px; text-decoration: none; border-radius: 3px; font-size: 12px; }
+        .btn-delete { background-color: #dc3545; color: white; padding: 5px 10px; text-decoration: none; border-radius: 3px; font-size: 12px; }
+        .btn-edit:hover, .btn-delete:hover { opacity: 0.8; }
+    </style>
 </head>
 <body>
 
 <div class="container">
     <h2>Formulir Pendaftaran Siswa</h2>
-
     <form method="POST" enctype="multipart/form-data">
         <label>Nama Calon Siswa</label>
         <input type="text" name="nama" required>
@@ -120,34 +108,42 @@ if (isset($_POST['submit'])) {
 
 <div class="container">
     <h2>Data Pendaftaran Siswa</h2>
-
-    <table border="1" cellpadding="5">
-        <tr>
-            <th rowspan="2">Nama</th>
-            <th colspan="2">Lahir</th>
-            <th rowspan="2">No Telp</th>
-            <th rowspan="2">Agama</th>
-        </tr>
-        <tr>
-            <th>Tempat</th>
-            <th>Tanggal</th>
-        </tr>
-
-        <?php
-        $query = "SELECT * FROM peserta";
-        $result = $pdo->query($query);
-
-        foreach ($result as $data) : ?>
+    <table border="1" cellpadding="5" style="width: 100%; border-collapse: collapse;">
+        <thead>
             <tr>
-                <td><?= htmlspecialchars($data['nama']); ?></td>
-                <td><?= htmlspecialchars($data['tempatLahir']); ?></td>
-                <td><?= date("d F Y", strtotime($data['tanggalLahir'])); ?></td>
-                <td><?= htmlspecialchars($data['telepon']); ?></td>
-                <td><?= htmlspecialchars($data['agama']); ?></td>
+                <th rowspan="2">Nama</th>
+                <th colspan="2">Lahir</th>
+                <th rowspan="2">No Telp</th>
+                <th rowspan="2">Agama</th>
+                <th rowspan="2">Aksi</th> </tr>
+            <tr>
+                <th>Tempat</th>
+                <th>Tanggal</th>
             </tr>
-        <?php endforeach; ?>
+        </thead>
+        <tbody>
+            <?php
+            $query = "SELECT * FROM peserta ORDER BY id DESC"; 
+            $result = $pdo->query($query);
+
+            foreach ($result as $data) : ?>
+                <tr>
+                    <td><?= htmlspecialchars($data['nama']); ?></td>
+                    <td><?= htmlspecialchars($data['tempatLahir']); ?></td>
+                    <td><?= date("d F Y", strtotime($data['tanggalLahir'])); ?></td>
+                    <td><?= htmlspecialchars($data['telepon']); ?></td>
+                    <td><?= htmlspecialchars($data['agama']); ?></td>
+                    <td align="center">
+                        <a href="edit.php?id=<?= $data['id']; ?>" class="btn-edit">Edit</a>
+                        
+                        <a href="hapus.php?id=<?= $data['id']; ?>" 
+                           class="btn-delete" 
+                           onclick="return confirm('Yakin ingin menghapus data ini?')">Hapus</a>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
     </table>
 </div>
 </body>
 </html>
-

@@ -1,0 +1,139 @@
+<?php
+
+include 'includes/koneksi.php'; 
+
+if (!isset($_GET['id'])) {
+    header("Location: index.php");
+    exit;
+}
+
+$id = $_GET['id'];
+
+$stmt = $pdo->prepare("SELECT * FROM peserta WHERE id = :id");
+$stmt->execute([':id' => $id]);
+$data = $stmt->fetch();
+
+if (!$data) {
+    echo "Data tidak ditemukan!";
+    exit;
+}
+
+if (isset($_POST['update'])) {
+    $nama     = $_POST['nama'];
+    $tempat   = $_POST['tempat'];
+    $tanggal  = $_POST['tanggal'];
+    $agama    = $_POST['agama'];
+    $alamat   = $_POST['alamat'];
+    $notelp   = $_POST['notelp'];
+
+    $jk = isset($_POST['jk']) ? $_POST['jk'] : null;
+    $jkValue = ($jk === "Pria") ? 0 : (($jk === "Wanita") ? 1 : null);
+
+    $hobi = !empty($_POST['hobi']) ? implode(", ", $_POST['hobi']) : null;
+
+    $foto = $data['foto']; 
+    if (!empty($_FILES['foto']['name'])) {
+        $target = "uploads/" . basename($_FILES['foto']['name']);
+        if (move_uploaded_file($_FILES['foto']['tmp_name'], $target)) {
+            $foto = $target;
+        }
+    }
+
+    $sql = "UPDATE peserta SET 
+            nama = :nama, 
+            \"tempatLahir\" = :tempatLahir, 
+            \"tanggalLahir\" = :tanggalLahir, 
+            agama = :agama, 
+            alamat = :alamat, 
+            telepon = :telepon, 
+            jk = :jk, 
+            hobi = :hobi, 
+            foto = :foto 
+            WHERE id = :id";
+    
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([
+        ':nama'         => $nama,
+        ':tempatLahir'  => $tempat,
+        ':tanggalLahir' => $tanggal,
+        ':agama'        => $agama,
+        ':alamat'       => $alamat,
+        ':telepon'      => $notelp,
+        ':jk'           => $jkValue,
+        ':hobi'         => $hobi,
+        ':foto'         => $foto,
+        ':id'           => $id
+    ]);
+
+    header("Location: index.php");
+    exit;
+}
+
+$hobiArray = $data['hobi'] ? explode(", ", $data['hobi']) : [];
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Data Siswa</title>
+    <link rel="stylesheet" href="assets/css/editstyle.css">
+</head>
+<body>
+
+<div class="container">
+    <h2>Edit Data Siswa</h2>
+    <form method="POST" enctype="multipart/form-data">
+        <label>Nama Calon Siswa</label>
+        <input type="text" name="nama" value="<?= htmlspecialchars($data['nama']) ?>" required>
+
+        <label>Tempat Lahir</label>
+        <input type="text" name="tempat" value="<?= htmlspecialchars($data['tempatLahir']) ?>" required>
+
+        <label>Tanggal Lahir</label>
+        <input type="date" name="tanggal" value="<?= $data['tanggalLahir'] ?>" required>
+
+        <label>Agama</label>
+        <select name="agama">
+            <?php 
+            $agamas = ['Islam', 'Kristen', 'Katolik', 'Hindu', 'Buddha', 'Konghucu'];
+            foreach ($agamas as $ag) {
+                $selected = ($data['agama'] == $ag) ? 'selected' : '';
+                echo "<option $selected>$ag</option>";
+            }
+            ?>
+        </select>
+
+        <label>Alamat</label>
+        <textarea name="alamat"><?= htmlspecialchars($data['alamat']) ?></textarea>
+
+        <label>No Telp/HP</label>
+        <input type="text" name="notelp" value="<?= htmlspecialchars($data['telepon']) ?>">
+
+        <label>Jenis Kelamin</label>
+        <div class="inline">
+            <input type="radio" name="jk" value="Pria" <?= ($data['jk'] == 0 && $data['jk'] !== null) ? 'checked' : '' ?>> Pria
+            <input type="radio" name="jk" value="Wanita" <?= ($data['jk'] == 1) ? 'checked' : '' ?>> Wanita
+        </div>
+        
+        <label>Hobi</label>
+        <div class="inline">
+            <input type="checkbox" name="hobi[]" value="Membaca" <?= in_array("Membaca", $hobiArray) ? 'checked' : '' ?>> Membaca
+            <input type="checkbox" name="hobi[]" value="Menulis" <?= in_array("Menulis", $hobiArray) ? 'checked' : '' ?>> Menulis
+            <input type="checkbox" name="hobi[]" value="Olahraga" <?= in_array("Olahraga", $hobiArray) ? 'checked' : '' ?>> Olahraga
+        </div>
+
+        <label>Pas Foto (Kosongkan jika tidak ingin ganti)</label>
+        <?php if ($data['foto']): ?>
+            <img src="<?= $data['foto'] ?>" width="120" class="img-preview">
+        <?php endif; ?>
+        <input type="file" name="foto">
+
+        <div class="btn-group">
+            <button type="submit" name="update">UPDATE DATA</button>
+            <a href="index.php" class="btn-cancel">Batal</a>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>
