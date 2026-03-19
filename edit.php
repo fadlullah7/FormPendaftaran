@@ -1,5 +1,4 @@
 <?php
-
 include 'includes/koneksi.php'; 
 
 if (!isset($_GET['id'])) {
@@ -8,67 +7,38 @@ if (!isset($_GET['id'])) {
 }
 
 $id = $_GET['id'];
-
 $stmt = $pdo->prepare("SELECT * FROM peserta WHERE id = :id");
 $stmt->execute([':id' => $id]);
 $data = $stmt->fetch();
 
-if (!$data) {
-    echo "Data tidak ditemukan!";
-    exit;
-}
+if (!$data) { echo "Data tidak ditemukan!"; exit; }
 
 if (isset($_POST['update'])) {
-    $nama     = $_POST['nama'];
-    $tempat   = $_POST['tempat'];
-    $tanggal  = $_POST['tanggal'];
-    $agama    = $_POST['agama'];
-    $alamat   = $_POST['alamat'];
-    $notelp   = $_POST['notelp'];
-
+    $nama = $_POST['nama'];
+    $tempat = $_POST['tempat'];
+    $tanggal = $_POST['tanggal'];
+    $agama = $_POST['agama'];
+    $alamat = $_POST['alamat'];
+    $notelp = $_POST['notelp'];
     $jk = isset($_POST['jk']) ? $_POST['jk'] : null;
     $jkValue = ($jk === "Pria") ? 0 : (($jk === "Wanita") ? 1 : null);
-
     $hobi = !empty($_POST['hobi']) ? implode(", ", $_POST['hobi']) : null;
-
     $foto = $data['foto']; 
+
     if (!empty($_FILES['foto']['name'])) {
         $target = "uploads/" . basename($_FILES['foto']['name']);
-        if (move_uploaded_file($_FILES['foto']['tmp_name'], $target)) {
-            $foto = $target;
-        }
+        if (move_uploaded_file($_FILES['foto']['tmp_name'], $target)) { $foto = $target; }
     }
 
-    $sql = "UPDATE peserta SET 
-            nama = :nama, 
-            \"tempatLahir\" = :tempatLahir, 
-            \"tanggalLahir\" = :tanggalLahir, 
-            agama = :agama, 
-            alamat = :alamat, 
-            telepon = :telepon, 
-            jk = :jk, 
-            hobi = :hobi, 
-            foto = :foto 
-            WHERE id = :id";
-    
+    $sql = "UPDATE peserta SET nama=:nama, \"tempatLahir\"=:tempatLahir, \"tanggalLahir\"=:tanggalLahir, 
+            agama=:agama, alamat=:alamat, telepon=:telepon, jk=:jk, hobi=:hobi, foto=:foto WHERE id=:id";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute([
-        ':nama'         => $nama,
-        ':tempatLahir'  => $tempat,
-        ':tanggalLahir' => $tanggal,
-        ':agama'        => $agama,
-        ':alamat'       => $alamat,
-        ':telepon'      => $notelp,
-        ':jk'           => $jkValue,
-        ':hobi'         => $hobi,
-        ':foto'         => $foto,
-        ':id'           => $id
-    ]);
+    $stmt->execute([':nama'=>$nama, ':tempatLahir'=>$tempat, ':tanggalLahir'=>$tanggal, ':agama'=>$agama, 
+                    ':alamat'=>$alamat, ':telepon'=>$notelp, ':jk'=>$jkValue, ':hobi'=>$hobi, ':foto'=>$foto, ':id'=>$id]);
 
     header("Location: index.php");
     exit;
 }
-
 $hobiArray = $data['hobi'] ? explode(", ", $data['hobi']) : [];
 ?>
 
@@ -82,7 +52,7 @@ $hobiArray = $data['hobi'] ? explode(", ", $data['hobi']) : [];
 
 <div class="container">
     <h2>Edit Data Siswa</h2>
-    <form method="POST" enctype="multipart/form-data">
+    <form id="formEdit" method="POST" enctype="multipart/form-data">
         <label>Nama Calon Siswa</label>
         <input type="text" name="nama" value="<?= htmlspecialchars($data['nama']) ?>" required>
 
@@ -122,18 +92,23 @@ $hobiArray = $data['hobi'] ? explode(", ", $data['hobi']) : [];
             <input type="checkbox" name="hobi[]" value="Olahraga" <?= in_array("Olahraga", $hobiArray) ? 'checked' : '' ?>> Olahraga
         </div>
 
-        <label>Pas Foto (Kosongkan jika tidak ingin ganti)</label>
+        <label>Pas Foto</label>
         <?php if ($data['foto']): ?>
-            <img src="<?= $data['foto'] ?>" width="120" class="img-preview">
+            <img src="<?= $data['foto'] ?>" width="120" id="previewLama" style="display:block; margin-bottom:10px; border-radius:8px;">
         <?php endif; ?>
-        <input type="file" name="foto">
+        
+        <input type="file" name="foto" id="inputFotoEdit">
+        <img id="previewBaru" src="#" style="display:none; width:120px; margin-top:10px; border-radius:8px; border: 2px solid #333;">
 
-        <div class="btn-group">
+        <div class="btn-group" style="margin-top:20px;">
             <button type="submit" name="update">UPDATE DATA</button>
-            <a href="index.php" class="btn-cancel">Batal</a>
+            <a href="index.php" class="btn-cancel" style="text-decoration:none; padding:10px; background:#eee; color:#333; border-radius:5px; margin-left:10px;">Batal</a>
         </div>
     </form>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="assets/js/edit.js"></script>
 
 </body>
 </html>

@@ -45,22 +45,17 @@ if (isset($_POST['submit'])) {
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
+    <meta charset="UTF-8">
     <title>Formulir Pendaftaran Siswa</title>
-    <link rel="stylesheet" href="assets/css/style.css">
-    <style>
-        
-        .btn-edit { background-color: #ffc107; color: black; padding: 5px 10px; text-decoration: none; border-radius: 3px; font-size: 12px; }
-        .btn-delete { background-color: #dc3545; color: white; padding: 5px 10px; text-decoration: none; border-radius: 3px; font-size: 12px; }
-        .btn-edit:hover, .btn-delete:hover { opacity: 0.8; }
-    </style>
+    <link rel="stylesheet" href="assets/css/style.css?v=3">
 </head>
 <body>
 
 <div class="container">
     <h2>Formulir Pendaftaran Siswa</h2>
-    <form method="POST" enctype="multipart/form-data">
+    <form id="formPendaftaran" method="POST" enctype="multipart/form-data">
         <label>Nama Calon Siswa</label>
         <input type="text" name="nama" required>
 
@@ -100,7 +95,8 @@ if (isset($_POST['submit'])) {
         </div>
 
         <label>Pas Foto</label>
-        <input type="file" name="foto">
+        <input type="file" name="foto" id="inputFoto">
+        <img id="preview" src="#" alt="Preview Foto" style="display:none; width:100px; margin-top:10px; border-radius:5px; border:1px solid #ddd;">
 
         <button type="submit" name="submit">SUBMIT</button>
     </form>
@@ -108,20 +104,25 @@ if (isset($_POST['submit'])) {
 
 <div class="container">
     <h2>Data Pendaftaran Siswa</h2>
-    <table border="1" cellpadding="5" style="width: 100%; border-collapse: collapse;">
+    
+    <input type="text" id="cariSiswa" class="search-box" placeholder="Cari nama siswa...">
+
+    <table class="tabel-data">
         <thead>
             <tr>
                 <th rowspan="2">Nama</th>
                 <th colspan="2">Lahir</th>
                 <th rowspan="2">No Telp</th>
                 <th rowspan="2">Agama</th>
-                <th rowspan="2">Aksi</th> </tr>
+                <th rowspan="2">Aksi</th> 
+            </tr>
             <tr>
                 <th>Tempat</th>
                 <th>Tanggal</th>
             </tr>
         </thead>
-        <tbody>
+        
+        <tbody id="tabelBody">
             <?php
             $query = "SELECT * FROM peserta ORDER BY id DESC"; 
             $result = $pdo->query($query);
@@ -135,15 +136,16 @@ if (isset($_POST['submit'])) {
                     <td><?= htmlspecialchars($data['agama']); ?></td>
                     <td align="center">
                         <a href="edit.php?id=<?= $data['id']; ?>" class="btn-edit">Edit</a>
-                        
-                        <a href="hapus.php?id=<?= $data['id']; ?>" 
-                           class="btn-delete" 
-                           onclick="return confirm('Yakin ingin menghapus data ini?')">Hapus</a>
+                        <button type="button" onclick="hapusData('hapus.php?id=<?= $data['id']; ?>')" class="btn-delete">Hapus</button>
                     </td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
     </table>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="assets/js/script.js"></script>
+
 </body>
 </html>
