@@ -1,4 +1,4 @@
-/* --- Google Fonts (Opsional tapi bikin mewah) --- */
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 
 * {
@@ -8,8 +8,8 @@
 }
 
 body {
-    font-family: 'Inter', sans-serif; /* Font lebih modern */
-    background-color: #f0f2f5; /* Abu-abu sangat muda khas aplikasi modern */
+    font-family: 'Inter', sans-serif; 
+    background-color: #f0f2f5; 
     color: #333;
     padding: 40px 20px;
 }
@@ -19,8 +19,8 @@ body {
     margin: 0 auto 30px auto;
     background: #ffffff;
     padding: 30px;
-    border-radius: 12px; /* Sudut lebih membulat */
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); /* Shadow halus */
+    border-radius: 12px; 
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); 
     border: none;
 }
 
@@ -33,7 +33,7 @@ h2 {
     text-align: left;
 }
 
-/* --- FORM STYLING --- */
+
 form label {
     display: block;
     margin-top: 18px;
@@ -59,7 +59,7 @@ form input[type="file"],
 }
 
 form input:focus, .search-box:focus {
-    border-color: #333; /* Fokus warna gelap elegan */
+    border-color: #333;
     box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
 }
 
@@ -69,7 +69,6 @@ form input:focus, .search-box:focus {
     gap: 15px;
 }
 
-/* Tombol Submit Utama */
 button[name="submit"] {
     margin-top: 25px;
     padding: 14px;
@@ -86,10 +85,10 @@ button[name="submit"] {
 
 button[name="submit"]:hover {
     background-color: #333;
-    transform: translateY(-2px); /* Efek melayang sedikit */
+    transform: translateY(-2px); 
 }
 
-/* --- TABLE STYLING --- */
+
 table {
     width: 100%;
     border-collapse: separate;
@@ -101,7 +100,7 @@ table {
 }
 
 th {
-    background-color: #f8f9fa !important; /* Abu-abu sangat muda profesional */
+    background-color: #f8f9fa !important; 
     color: #666;
     font-weight: 700;
     text-align: center;
@@ -167,43 +166,40 @@ h2 {
     border-color: #333;
 }
 
-/* --- TABLE MODERN --- */
 table {
     width: 100%;
-    border-collapse: collapse; /* Menghilangkan garis ganda antar sel */
+    border-collapse: collapse; 
     margin-top: 15px;
     background-color: white;
     overflow: hidden;
 }
 
 th {
-    background-color: #333 !important; /* Header Hitam sesuai gambar */
+    background-color: #333 !important; 
     color: white !important;
     padding: 15px 10px;
     font-size: 13px;
     text-transform: uppercase;
-    border: none !important; /* Hilangkan garis di header agar bersih */
+    border: none !important; 
 }
 
 td {
     padding: 12px 10px;
-    border-bottom: 1px solid #eee; /* Hanya garis bawah agar minimalis */
+    border-bottom: 1px solid #eee; 
     text-align: center;
-    vertical-align: middle; /* Memastikan teks & tombol sejajar vertikal */
+    vertical-align: middle; 
 }
 
-/* --- TOMBOL AKSI SEJAJAR --- */
 .btn-edit, 
 .btn-delete {
     display: inline-flex !important;
     align-items: center;
     justify-content: center;
     
-    /* Ukuran harus sama persis */
     width: 70px !important;
     height: 32px !important;
     
-    margin: 0 3px !important; /* Jarak kiri-kanan agar tidak dempet */
+    margin: 0 3px !important;
     padding: 0 !important;
     border-radius: 4px !important;
     font-size: 12px !important;
@@ -213,13 +209,13 @@ td {
     cursor: pointer !important;
 }
 
-/* Warna Edit (Kuning) */
+
 a.btn-edit {
     background-color: #ffc107 !important;
     color: #000 !important;
 }
 
-/* Warna Hapus (Merah) */
+
 button.btn-delete {
     background-color: #dc3545 !important;
     color: #fff !important;
