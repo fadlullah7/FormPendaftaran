@@ -1,6 +1,7 @@
 <?php
 include 'includes/koneksi.php'; 
 
+
 if (!isset($_GET['id'])) {
     header("Location: index.php");
     exit;
@@ -11,40 +12,68 @@ $stmt = $pdo->prepare("SELECT * FROM peserta WHERE id = :id");
 $stmt->execute([':id' => $id]);
 $data = $stmt->fetch();
 
-if (!$data) { echo "Data tidak ditemukan!"; exit; }
+if (!$data) { 
+    echo "Data tidak ditemukan!"; 
+    exit; 
+}
+
+
+$hobiArray = !empty($data['hobi']) ? explode(", ", $data['hobi']) : [];
+
 
 if (isset($_POST['update'])) {
-    $nama = $_POST['nama'];
-    $tempat = $_POST['tempat'];
+    
+    $nama    = $_POST['nama'];
+    $tempat  = $_POST['tempat'];
     $tanggal = $_POST['tanggal'];
-    $agama = $_POST['agama'];
-    $alamat = $_POST['alamat'];
-    $notelp = $_POST['notelp'];
+    $agama   = $_POST['agama'];
+    $alamat  = $_POST['alamat'];
+    $notelp  = $_POST['notelp'];
+
     $jk = isset($_POST['jk']) ? $_POST['jk'] : null;
     $jkValue = ($jk === "Pria") ? 0 : (($jk === "Wanita") ? 1 : null);
-    $hobi = !empty($_POST['hobi']) ? implode(", ", $_POST['hobi']) : null;
-    $foto = $data['foto']; 
 
+    $hobi = !empty($_POST['hobi']) ? implode(", ", $_POST['hobi']) : null;
+
+    $foto = $data['foto']; 
+    
     if (!empty($_FILES['foto']['name'])) {
         $target = "uploads/" . basename($_FILES['foto']['name']);
-        if (move_uploaded_file($_FILES['foto']['tmp_name'], $target)) { $foto = $target; }
+        if (!is_dir("uploads")) mkdir("uploads");
+        
+        if (move_uploaded_file($_FILES['foto']['tmp_name'], $target)) { 
+            $foto = $target; 
+        }
     }
 
     $sql = "UPDATE peserta SET nama=:nama, \"tempatLahir\"=:tempatLahir, \"tanggalLahir\"=:tanggalLahir, 
             agama=:agama, alamat=:alamat, telepon=:telepon, jk=:jk, hobi=:hobi, foto=:foto WHERE id=:id";
+    
     $stmt = $pdo->prepare($sql);
-    $stmt->execute([':nama'=>$nama, ':tempatLahir'=>$tempat, ':tanggalLahir'=>$tanggal, ':agama'=>$agama, 
-                    ':alamat'=>$alamat, ':telepon'=>$notelp, ':jk'=>$jkValue, ':hobi'=>$hobi, ':foto'=>$foto, ':id'=>$id]);
+    
+   
+    $stmt->execute([
+        ':nama'         => $nama,
+        ':tempatLahir'  => $tempat,
+        ':tanggalLahir' => $tanggal,
+        ':agama'        => $agama,
+        ':alamat'       => $alamat,
+        ':telepon'      => $notelp,
+        ':jk'           => $jkValue,
+        ':hobi'         => $hobi,
+        ':foto'         => $foto,
+        ':id'           => $id
+    ]);
 
     header("Location: index.php");
     exit;
 }
-$hobiArray = $data['hobi'] ? explode(", ", $data['hobi']) : [];
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
+    <meta charset="UTF-8">
     <title>Edit Data Siswa</title>
     <link rel="stylesheet" href="assets/css/editstyle.css">
 </head>
@@ -64,13 +93,12 @@ $hobiArray = $data['hobi'] ? explode(", ", $data['hobi']) : [];
 
         <label>Agama</label>
         <select name="agama">
-            <?php 
-            $agamas = ['Islam', 'Kristen', 'Katolik', 'Hindu', 'Buddha', 'Konghucu'];
-            foreach ($agamas as $ag) {
-                $selected = ($data['agama'] == $ag) ? 'selected' : '';
-                echo "<option $selected>$ag</option>";
-            }
-            ?>
+            <option <?= ($data['agama'] == 'Islam') ? 'selected' : '' ?>>Islam</option>
+            <option <?= ($data['agama'] == 'Kristen') ? 'selected' : '' ?>>Kristen</option>
+            <option <?= ($data['agama'] == 'Katolik') ? 'selected' : '' ?>>Katolik</option>
+            <option <?= ($data['agama'] == 'Hindu') ? 'selected' : '' ?>>Hindu</option>
+            <option <?= ($data['agama'] == 'Buddha') ? 'selected' : '' ?>>Buddha</option>
+            <option <?= ($data['agama'] == 'Konghucu') ? 'selected' : '' ?>>Konghucu</option>
         </select>
 
         <label>Alamat</label>
