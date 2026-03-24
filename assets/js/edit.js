@@ -1,21 +1,24 @@
 document.addEventListener('DOMContentLoaded', function() {
-
-    const form = document.getElementById('formEdit');
+    
+    // --- 1. FITUR PRATINJAU FOTO ---
     const inputFoto = document.getElementById('inputFotoEdit');
     const previewBaru = document.getElementById('previewBaru');
     const previewLama = document.getElementById('previewLama');
 
-    if (inputFoto) {
-        inputFoto.addEventListener('change', function() {
-            const file = this.files[0];
+    if (inputFoto && previewBaru) {
+        inputFoto.onchange = evt => {
+            const [file] = inputFoto.files;
             if (file) {
                 previewBaru.src = URL.createObjectURL(file);
                 previewBaru.style.display = 'block';
                 if (previewLama) previewLama.style.opacity = '0.3';
             }
-        });
+        }
     }
 
+    // --- 2. FITUR VALIDASI FORM ---
+    const form = document.getElementById('formEdit');
+    
     if (form) {
         form.addEventListener('submit', function(e) {
             const nama = document.querySelector('input[name="nama"]').value;
@@ -26,10 +29,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 Swal.fire('Oops!', 'Nama minimal 3 karakter!', 'error');
                 return;
             }
-
-            if (notelp !== "" && isNaN(notelp)) {
+            
+            if (notelp !== "" && !/^\d+$/.test(notelp)) {
                 e.preventDefault(); 
-                Swal.fire('Error', 'Nomor telepon harus angka!', 'error');
+                Swal.fire('Error', 'Nomor telepon harus berupa angka!', 'error');
                 return;
             }
             
