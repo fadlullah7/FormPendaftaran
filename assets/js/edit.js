@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
     
-    // --- 1. FITUR PRATINJAU FOTO ---
     const inputFoto = document.getElementById('inputFotoEdit');
     const previewBaru = document.getElementById('previewBaru');
     const previewLama = document.getElementById('previewLama');
@@ -16,7 +15,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // --- 2. FITUR VALIDASI FORM ---
     const form = document.getElementById('formEdit');
     
     if (form) {
@@ -37,6 +35,56 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             console.log("Validasi Berhasil!");
+        });
+    }
+
+    const selectProvinsi = document.getElementById('pilihProvinsi');
+    const selectKabkot = document.getElementById('pilihKabkot');
+
+    function loadKabkot(idProvinsi, idKabkotSelected = null) {
+        if (!idProvinsi) {
+            selectKabkot.innerHTML = '<option value="">-- Pilih Kab/Kota --</option>';
+            selectKabkot.disabled = true;
+            return;
+        }
+
+        selectKabkot.innerHTML = '<option value="">Memuat data...</option>';
+        selectKabkot.disabled = true;
+
+        fetch(`get_kabkot.php?id_prov=${idProvinsi}`)
+            .then(response => response.json())
+            .then(data => {
+                selectKabkot.innerHTML = '<option value="">-- Pilih Kab/Kota --</option>';
+                
+                data.forEach(kabkot => {
+                    const option = document.createElement('option');
+                    option.value = kabkot.id;
+                    option.textContent = kabkot.nama_kabkot;
+                    
+                    if (idKabkotSelected && kabkot.id == idKabkotSelected) {
+                        option.selected = true;
+                    }
+                    
+                    selectKabkot.appendChild(option);
+                });
+
+                selectKabkot.disabled = false;
+            })
+            .catch(error => {
+                console.error('Terjadi kesalahan:', error);
+                selectKabkot.innerHTML = '<option value="">Gagal memuat data</option>';
+            });
+    }
+
+    if (selectProvinsi && selectKabkot) {
+        const savedProvId = selectProvinsi.value;
+        const savedKabkotId = selectKabkot.getAttribute('data-selected');
+
+        if (savedProvId) {
+            loadKabkot(savedProvId, savedKabkotId);
+        }
+        selectProvinsi.addEventListener('change', function() {
+            loadKabkot(this.value, null); 
         });
     }
 });

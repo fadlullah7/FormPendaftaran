@@ -1,6 +1,10 @@
 <?php
 include 'includes/koneksi.php';
 
+
+$queryProv = $pdo->query("SELECT * FROM provinsi ORDER BY nama_provinsi ASC");
+$dataProvinsi = $queryProv->fetchAll(PDO::FETCH_ASSOC);
+
 if (isset($_POST['submit'])) {
     
     $nama     = $_POST['nama'];
@@ -9,6 +13,8 @@ if (isset($_POST['submit'])) {
     $agama    = $_POST['agama'];
     $alamat   = $_POST['alamat'];
     $notelp   = $_POST['notelp'];
+    $provinsi_id = $_POST['provinsi_id'];
+    $kabkot_id   = $_POST['kabkot_id'];
 
     $jk = isset($_POST['jk']) ? $_POST['jk'] : null;
     $jkValue = ($jk === "Pria") ? 0 : (($jk === "Wanita") ? 1 : null);
@@ -24,8 +30,8 @@ if (isset($_POST['submit'])) {
         }
     }
 
-    $sql = "INSERT INTO peserta (nama, \"tempatLahir\", \"tanggalLahir\", agama, alamat, telepon, jk, hobi, foto)
-            VALUES (:nama, :tempatLahir, :tanggalLahir, :agama, :alamat, :telepon, :jk, :hobi, :foto)";
+    $sql = "INSERT INTO peserta (nama, \"tempatLahir\", \"tanggalLahir\", agama, alamat, telepon, jk, hobi, foto, provinsi_id, kabkot_id)
+            VALUES (:nama, :tempatLahir, :tanggalLahir, :agama, :alamat, :telepon, :jk, :hobi, :foto, :provinsi_id, :kabkot_id)";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([
         ':nama'         => $nama,
@@ -36,7 +42,9 @@ if (isset($_POST['submit'])) {
         ':telepon'      => $notelp,
         ':jk'           => $jkValue,
         ':hobi'         => $hobi,
-        ':foto'         => $foto
+        ':foto'         => $foto,
+        ':provinsi_id'  => $provinsi_id, 
+        ':kabkot_id'    => $kabkot_id    
     ]);
     
     header("Location: index.php"); 
@@ -49,7 +57,7 @@ if (isset($_POST['submit'])) {
 <head>
     <meta charset="UTF-8">
     <title>Formulir Pendaftaran Siswa</title>
-    <link rel="stylesheet" href="assets/css/style.css?v=3">
+    <link rel="stylesheet" href="assets/css/style.css?v=2">
 </head>
 <body>
 
@@ -75,7 +83,19 @@ if (isset($_POST['submit'])) {
             <option>Konghucu</option>
         </select>
 
-        <label>Alamat</label>
+        <label>Provinsi</label>
+        <select name="provinsi_id" id="pilihProvinsi" required>
+            <option value="">-- Pilih Provinsi --</option>
+            <?php foreach ($dataProvinsi as $prov): ?>
+                <option value="<?= $prov['id'] ?>"><?= $prov['nama_provinsi'] ?></option>
+            <?php endforeach; ?>
+        </select>
+
+        <label>Kabupaten/Kota</label>
+        <select name="kabkot_id" id="pilihKabkot" disabled required>
+            <option value="">-- Pilih Kab/Kota --</option>
+        </select>
+        <label>Alamat Lengkap</label>
         <textarea name="alamat"></textarea>
 
         <label>No Telp/HP</label>
@@ -133,7 +153,7 @@ if (isset($_POST['submit'])) {
                     <td><?= htmlspecialchars($data['tempatLahir']); ?></td>
                     <td><?= date("d F Y", strtotime($data['tanggalLahir'])); ?></td>
                     <td><?= htmlspecialchars($data['telepon']); ?></td>
-                    <td><?= htmlspecialchars($data['agama']); ?></td>
+                    <td><?= htmlspecialchars($data['agama']); ?></td>   
                     <td align="center">
                         <a href="edit.php?id=<?= $data['id']; ?>" class="btn-edit">Edit</a>
                         <button type="button" onclick="hapusData('hapus.php?id=<?= $data['id']; ?>')" class="btn-delete">Hapus</button>

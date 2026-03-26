@@ -1,7 +1,6 @@
 <?php
 include 'includes/koneksi.php'; 
 
-
 if (!isset($_GET['id'])) {
     header("Location: index.php");
     exit;
@@ -17,8 +16,9 @@ if (!$data) {
     exit; 
 }
 
-
 $hobiArray = !empty($data['hobi']) ? explode(", ", $data['hobi']) : [];
+$queryProv = $pdo->query("SELECT * FROM provinsi ORDER BY nama_provinsi ASC");
+$dataProvinsi = $queryProv->fetchAll(PDO::FETCH_ASSOC);
 
 
 if (isset($_POST['update'])) {
@@ -29,6 +29,8 @@ if (isset($_POST['update'])) {
     $agama   = $_POST['agama'];
     $alamat  = $_POST['alamat'];
     $notelp  = $_POST['notelp'];
+    $provinsi_id = $_POST['provinsi_id'];
+    $kabkot_id   = $_POST['kabkot_id'];
 
     $jk = isset($_POST['jk']) ? $_POST['jk'] : null;
     $jkValue = ($jk === "Pria") ? 0 : (($jk === "Wanita") ? 1 : null);
@@ -47,11 +49,11 @@ if (isset($_POST['update'])) {
     }
 
     $sql = "UPDATE peserta SET nama=:nama, \"tempatLahir\"=:tempatLahir, \"tanggalLahir\"=:tanggalLahir, 
-            agama=:agama, alamat=:alamat, telepon=:telepon, jk=:jk, hobi=:hobi, foto=:foto WHERE id=:id";
+            agama=:agama, alamat=:alamat, telepon=:telepon, jk=:jk, hobi=:hobi, foto=:foto, 
+            provinsi_id=:provinsi_id, kabkot_id=:kabkot_id WHERE id=:id";
     
     $stmt = $pdo->prepare($sql);
     
-   
     $stmt->execute([
         ':nama'         => $nama,
         ':tempatLahir'  => $tempat,
@@ -62,6 +64,8 @@ if (isset($_POST['update'])) {
         ':jk'           => $jkValue,
         ':hobi'         => $hobi,
         ':foto'         => $foto,
+        ':provinsi_id'  => $provinsi_id,
+        ':kabkot_id'    => $kabkot_id,
         ':id'           => $id
     ]);
 
@@ -75,7 +79,7 @@ if (isset($_POST['update'])) {
 <head>
     <meta charset="UTF-8">
     <title>Edit Data Siswa</title>
-    <link rel="stylesheet" href="assets/css/editstyle.css">
+    <link rel="stylesheet" href="assets/css/editstyle.css?=v2">
 </head>
 <body>
 
@@ -101,6 +105,20 @@ if (isset($_POST['update'])) {
             <option <?= ($data['agama'] == 'Konghucu') ? 'selected' : '' ?>>Konghucu</option>
         </select>
 
+        <label>Provinsi</label>
+        <select name="provinsi_id" id="pilihProvinsi" required>
+            <option value="">-- Pilih Provinsi --</option>
+            <?php foreach ($dataProvinsi as $prov): ?>
+                <option value="<?= $prov['id'] ?>" <?= ($data['provinsi_id'] == $prov['id']) ? 'selected' : '' ?>>
+                    <?= $prov['nama_provinsi'] ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+
+        <label>Kabupaten/Kota</label>
+        <select name="kabkot_id" id="pilihKabkot" data-selected="<?= $data['kabkot_id'] ?>" required>
+            <option value="">-- Pilih Kab/Kota --</option>
+        </select>
         <label>Alamat</label>
         <textarea name="alamat"><?= htmlspecialchars($data['alamat']) ?></textarea>
 

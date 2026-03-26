@@ -8,6 +8,23 @@ body {
     color: #2d3436;
 }
 
+@keyframes slideBounce {
+    0% { transform: translateY(60px) scale(0.9); opacity: 0; }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+@keyframes floating {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-5px); }
+    100% { transform: translateY(0px); }
+}
+
+@keyframes jelly {
+    0%, 100% { transform: scale(1, 1); }
+    25% { transform: scale(1.05, 0.95); }
+    50% { transform: scale(0.95, 1.05); }
+    75% { transform: scale(1.02, 0.98); }
+}
 .container {
     max-width: 550px;
     background: #ffffff;
@@ -16,6 +33,9 @@ body {
     border-radius: 20px;
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.8);
+    
+    animation: slideBounce 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+    transform-origin: top center;
 }
 
 h2 {
@@ -36,8 +56,13 @@ h2::after {
     background: #3498db;
     margin: 10px auto 0;
     border-radius: 10px;
+    transition: width 0.3s ease;
 }
 
+.container:hover h2::after {
+    width: 100px;
+    background: #0984e3;
+}
 
 label {
     display: block;
@@ -61,21 +86,23 @@ textarea {
     background-color: #f8fafc;
     font-size: 15px;
     color: #333;
-    transition: all 0.3s ease;
+    box-sizing: border-box;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
+
 input:focus, textarea:focus, select:focus {
+    transform: scale(1.02); 
     border-color: #3498db;
     background-color: #fff;
     outline: none;
-    box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.15);
+    box-shadow: 0 8px 20px rgba(52, 152, 219, 0.2);
 }
 
 textarea {
     height: 100px;
     resize: vertical;
 }
-
 
 .inline {
     margin-bottom: 25px;
@@ -86,6 +113,11 @@ textarea {
     flex-wrap: wrap;
     gap: 15px;
     align-items: center;
+    transition: all 0.3s ease;
+}
+
+.inline:hover {
+    background: #e2e8f0;
 }
 
 .inline label {
@@ -105,6 +137,7 @@ textarea {
     cursor: pointer;
 }
 
+
 .img-preview {
     display: block;
     max-width: 150px;
@@ -112,11 +145,11 @@ textarea {
     margin: 10px 0 20px;
     border: 3px solid #fff;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    transition: transform 0.3s ease;
+    transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
 .img-preview:hover {
-    transform: scale(1.05);
+    transform: scale(1.1) rotate(3deg);
 }
 
 #previewBaru {
@@ -125,10 +158,26 @@ textarea {
     background: #fff;
 }
 
+input[type="file"] {
+    background: #fff;
+    padding: 10px;
+    border: 2px dashed #cbd5e1;
+    cursor: pointer;
+    width: 100%;
+    box-sizing: border-box;
+    transition: all 0.3s;
+}
+
+input[type="file"]:hover {
+    border-color: #3498db;
+    background: #f0f8ff;
+}
+
+
 .btn-group {
     display: flex;
     gap: 15px;
-    margin-top: 10px;
+    margin-top: 20px;
 }
 
 button[name="update"] {
@@ -142,17 +191,19 @@ button[name="update"] {
     font-size: 16px;
     font-weight: 700;
     box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+    animation: floating 3s ease-in-out infinite;
     transition: all 0.3s ease;
 }
 
 button[name="update"]:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(46, 204, 113, 0.4);
+    animation: jelly 0.6s ease;
+    box-shadow: 0 8px 25px rgba(46, 204, 113, 0.5);
     filter: brightness(1.1);
 }
 
 button[name="update"]:active {
-    transform: translateY(0);
+    transform: translateY(2px);
+    animation: none;
 }
 
 .btn-cancel {
@@ -166,18 +217,12 @@ button[name="update"]:active {
     font-size: 16px;
     font-weight: 600;
     border: 2px solid #e74c3c;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .btn-cancel:hover {
     background: #e74c3c;
     color: #fff;
-    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.2);
-}
-
-input[type="file"] {
-    background: #fff;
-    padding: 10px;
-    border: 2px dashed #cbd5e1;
-    cursor: pointer;
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(231, 76, 60, 0.3);
 }
